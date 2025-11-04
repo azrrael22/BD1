@@ -59,10 +59,10 @@ public class RegistroActividadRepositoryImpl implements IRegistroActividadReposi
         String sql = "SELECT * FROM registro_actividad WHERE id_usuario = ? ORDER BY fecha DESC";
         try {
             List<RegistroActividad> result = jdbcTemplate.query(sql, new RegistroActividadRowMapper(), idUsuario);
-            System.out.println("✅ findByUsuario(" + idUsuario + ") ejecutado correctamente. Registros: " + result.size());
+            System.out.println("findByUsuario(" + idUsuario + ") ejecutado correctamente. Registros: " + result.size());
             return result;
         } catch (Exception e) {
-            System.err.println("❌ ERROR en findByUsuario(" + idUsuario + "):");
+            System.err.println("ERROR en findByUsuario(" + idUsuario + "):");
             System.err.println("   Mensaje: " + e.getMessage());
             e.printStackTrace();
             return List.of();
@@ -74,10 +74,10 @@ public class RegistroActividadRepositoryImpl implements IRegistroActividadReposi
         String sql = "SELECT * FROM registro_actividad WHERE id_actividad = ? ORDER BY fecha DESC";
         try {
             List<RegistroActividad> result = jdbcTemplate.query(sql, new RegistroActividadRowMapper(), idActividad);
-            System.out.println("✅ findByActividad(" + idActividad + ") ejecutado correctamente. Registros: " + result.size());
+            System.out.println("findByActividad(" + idActividad + ") ejecutado correctamente. Registros: " + result.size());
             return result;
         } catch (Exception e) {
-            System.err.println("❌ ERROR en findByActividad(" + idActividad + "):");
+            System.err.println("ERROR en findByActividad(" + idActividad + "):");
             System.err.println("   Mensaje: " + e.getMessage());
             e.printStackTrace();
             return List.of();
@@ -110,9 +110,9 @@ public class RegistroActividadRepositoryImpl implements IRegistroActividadReposi
                     registro.getFrecuenciaCardiacaPromedio(), // Puede ser null
                     registro.getNotas() // Puede ser null
             );
-            System.out.println("✅ save() ejecutado correctamente. ID: " + registro.getIdRegistro());
+            System.out.println("save() ejecutado correctamente. ID: " + registro.getIdRegistro());
         } catch (Exception e) {
-            System.err.println("❌ ERROR en save():");
+            System.err.println("ERROR en save():");
             System.err.println("   Mensaje: " + e.getMessage());
             e.printStackTrace();
             throw e;
@@ -142,9 +142,9 @@ public class RegistroActividadRepositoryImpl implements IRegistroActividadReposi
                     registro.getNotas(),
                     registro.getIdRegistro()
             );
-            System.out.println("✅ update() ejecutado correctamente. ID: " + registro.getIdRegistro());
+            System.out.println("update() ejecutado correctamente. ID: " + registro.getIdRegistro());
         } catch (Exception e) {
-            System.err.println("❌ ERROR en update():");
+            System.err.println("ERROR en update():");
             System.err.println("   Mensaje: " + e.getMessage());
             e.printStackTrace();
             throw e;
@@ -156,9 +156,9 @@ public class RegistroActividadRepositoryImpl implements IRegistroActividadReposi
         String sql = "DELETE FROM registro_actividad WHERE id_registro = ?";
         try {
             jdbcTemplate.update(sql, idRegistro);
-            System.out.println("✅ deleteById(" + idRegistro + ") ejecutado correctamente");
+            System.out.println("deleteById(" + idRegistro + ") ejecutado correctamente");
         } catch (Exception e) {
-            System.err.println("❌ ERROR en deleteById(" + idRegistro + "):");
+            System.err.println("ERROR en deleteById(" + idRegistro + "):");
             System.err.println("   Mensaje: " + e.getMessage());
             e.printStackTrace();
             throw e;
@@ -173,10 +173,6 @@ public class RegistroActividadRepositoryImpl implements IRegistroActividadReposi
                 BigDecimal distanciaBD = rs.getBigDecimal("distancia");
                 Double distancia = (distanciaBD != null) ? distanciaBD.doubleValue() : null;
 
-                // Para peso_actual en historial_progreso también usa NUMERIC
-                BigDecimal pesoActualBD = rs.getBigDecimal("peso_actual");
-                Double pesoActual = (pesoActualBD != null) ? pesoActualBD.doubleValue() : null;
-
                 return RegistroActividad.builder()
                         .idRegistro(rs.getString("id_registro"))
                         .idUsuario(rs.getString("id_usuario"))
@@ -184,14 +180,14 @@ public class RegistroActividadRepositoryImpl implements IRegistroActividadReposi
                         .idEvento(rs.getString("id_evento"))
                         .fecha(rs.getTimestamp("fecha").toLocalDateTime())
                         .duracion(rs.getTime("duracion").toLocalTime())
-                        .distancia(distancia) // 🔧 CORREGIDO
+                        .distancia(distancia)
                         .caloriasEstimadas(rs.getInt("calorias_estimadas"))
                         .caloriasAlcanzadas(rs.getInt("calorias_alcanzadas"))
                         .frecuenciaCardiacaPromedio(rs.getObject("frecuencia_cardiaca_promedio", Integer.class))
                         .notas(rs.getString("notas"))
                         .build();
             } catch (Exception e) {
-                System.err.println("❌ ERROR en RegistroActividadRowMapper.mapRow():");
+                System.err.println("ERROR en RegistroActividadRowMapper.mapRow():");
                 System.err.println("   Fila: " + rowNum);
                 System.err.println("   Mensaje: " + e.getMessage());
                 e.printStackTrace();
