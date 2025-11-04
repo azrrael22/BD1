@@ -6,6 +6,7 @@ import com.movesync.move_sync_api.domain.entity.Logro;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -32,6 +33,17 @@ public class LogroServiceImpl implements ILogroService {
     @Override
     public void registrarLogro(Logro logro) {
         validarLogro(logro);
+
+        // NUEVO - Establecer fecha de obtención
+        if (logro.getFechaObtenido() == null) {
+            logro.setFechaObtenido(LocalDateTime.now());
+        }
+
+        // NUEVO - Establecer puntos por defecto si no se proporciona
+        if (logro.getPuntos() == null) {
+            logro.setPuntos(0);
+        }
+
         logroRepository.save(logro);
     }
 
@@ -61,6 +73,22 @@ public class LogroServiceImpl implements ILogroService {
         }
         if (logro.getIdUsuario() == null || logro.getIdUsuario().isBlank()) {
             throw new IllegalArgumentException("El id de usuario es obligatorio.");
+        }
+
+        // NUEVO - Validar tipo
+        validarTipo(logro.getTipo());
+
+        // NUEVO - Validar puntos si se proporcionan
+        if (logro.getPuntos() != null && logro.getPuntos() < 0) {
+            throw new IllegalArgumentException("Los puntos deben ser 0 o mayor.");
+        }
+    }
+
+    // NUEVO - Validar tipos permitidos
+    private void validarTipo(String tipo) {
+        List<String> tiposPermitidos = List.of("ACTIVIDAD", "CONSISTENCIA", "HABILIDAD", "SOCIAL", "META");
+        if (!tiposPermitidos.contains(tipo)) {
+            throw new IllegalArgumentException("Tipo inválido. Los tipos permitidos son: ACTIVIDAD, CONSISTENCIA, HABILIDAD, SOCIAL, META");
         }
     }
 }

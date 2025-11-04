@@ -27,12 +27,24 @@ public class EventoServiceImpl implements IEventoService {
     @Override
     public void registrarEvento(Evento evento) {
         validarEvento(evento);
+
+        // NUEVO - Establecer estado por defecto si no se proporciona
+        if (evento.getEstado() == null || evento.getEstado().isBlank()) {
+            evento.setEstado("PROGRAMADO");
+        }
+
         eventoRepository.save(evento);
     }
 
     @Override
     public void actualizarEvento(Evento evento) {
         validarEvento(evento);
+
+        // NUEVO - Validar estado si se proporciona
+        if (evento.getEstado() != null && !evento.getEstado().isBlank()) {
+            validarEstado(evento.getEstado());
+        }
+
         eventoRepository.update(evento);
     }
 
@@ -50,6 +62,19 @@ public class EventoServiceImpl implements IEventoService {
         }
         if (evento.getDuracion() == null) {
             throw new IllegalArgumentException("La duración es obligatoria.");
+        }
+
+        // NUEVO - Validar capacidad máxima si se proporciona
+        if (evento.getCapacidadMaxima() != null && evento.getCapacidadMaxima() <= 0) {
+            throw new IllegalArgumentException("La capacidad máxima debe ser mayor a 0.");
+        }
+    }
+
+    // NUEVO - Validar estados permitidos
+    private void validarEstado(String estado) {
+        List<String> estadosPermitidos = List.of("PROGRAMADO", "EN_CURSO", "FINALIZADO", "CANCELADO");
+        if (!estadosPermitidos.contains(estado)) {
+            throw new IllegalArgumentException("Estado inválido. Los estados permitidos son: PROGRAMADO, EN_CURSO, FINALIZADO, CANCELADO");
         }
     }
 }

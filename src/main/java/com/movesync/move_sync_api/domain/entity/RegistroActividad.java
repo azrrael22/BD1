@@ -10,28 +10,22 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
-public class Evento {
-    private String idEvento;
-
-    private String nombre;
-
-    // NUEVO
-    private String descripcion;
+public class RegistroActividad {
+    private String idRegistro;
+    private String idUsuario;
+    private String idActividad;
+    private String idEvento; // Puede ser null
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Constants.DATE_TIME_PATTERN)
     private LocalDateTime fecha;
 
     private LocalTime duracion;
-
-    // NUEVO
-    private String ubicacion;
-
-    // NUEVO
-    private Integer capacidadMaxima;
-
-    // NUEVO
-    private String estado; // PROGRAMADO, EN_CURSO, FINALIZADO, CANCELADO
+    private Double distancia; // Puede ser null
+    private Integer caloriasEstimadas;
+    private Integer caloriasAlcanzadas;
+    private Integer frecuenciaCardiacaPromedio; // Puede ser null
+    private String notas; // Puede ser null
 }

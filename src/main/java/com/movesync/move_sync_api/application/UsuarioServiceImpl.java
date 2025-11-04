@@ -6,6 +6,7 @@ import com.movesync.move_sync_api.domain.entity.Usuario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -31,14 +32,18 @@ public class UsuarioServiceImpl implements IUsuarioService {
 
     @Override
     public Usuario obtenerPorCorreo(String correo) {
-        // Compatibilidad: si piden buscar por correo, lo interpretamos como búsqueda por cédula
-        // (según requisito del usuario). Intentamos buscar por cédula con el valor proporcionado.
         return usuarioRepository.findByCedula(correo);
     }
 
     @Override
     public void registrarUsuario(Usuario usuario) {
         validarUsuario(usuario);
+
+        // NUEVO - Establecer fecha de registro
+        if (usuario.getFechaRegistro() == null) {
+            usuario.setFechaRegistro(LocalDateTime.now());
+        }
+
         usuarioRepository.save(usuario);
     }
 

@@ -10,10 +10,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class Actividad {
-
     private String idActividad;
-
     private String idTipo;
 
+    // NUEVO
+    private String nombre;
+
     private String descripcion;
+
+    // NUEVO
+    private Integer duracionEstimadaMinutos;
+
+    // NUEVO
+    private String nivelDificultad; // PRINCIPIANTE, INTERMEDIO, AVANZADO
 }

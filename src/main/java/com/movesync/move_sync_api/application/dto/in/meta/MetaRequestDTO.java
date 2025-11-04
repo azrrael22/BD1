@@ -11,6 +11,10 @@ import java.time.LocalDate;
 @Data
 public class MetaRequestDTO {
 
+    // NUEVO - CRÍTICO
+    @NotBlank(message = "El id de usuario no puede estar vacío")
+    private String idUsuario;
+
     @NotNull(message = "La fecha de inicio no puede estar vacía")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Constants.DATA_PATTERN)
     private LocalDate fechaInicio;
@@ -23,4 +27,7 @@ public class MetaRequestDTO {
     private String objetivo;
 
     private String perdidaCaloriasDiarias;
+
+    // NUEVO - Opcional (se establece por defecto en el servicio)
+    private String estado; // ACTIVA, COMPLETADA, CANCELADA
 }

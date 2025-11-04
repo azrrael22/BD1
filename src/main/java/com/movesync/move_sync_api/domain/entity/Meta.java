@@ -6,16 +6,17 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.time.LocalDate;
+import java.time.LocalDateTime; // NUEVO
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class Meta {
-
     private String idMeta;
+
+    private String idUsuario; // NUEVO - faltaba en la entidad original
 
     private LocalDate fechaInicio;
 
@@ -25,4 +26,11 @@ public class Meta {
     private String objetivo;
 
     private String perdidaCaloriasDiarias;
+
+    // NUEVO
+    private String estado; // ACTIVA, COMPLETADA, CANCELADA
+
+    // NUEVO
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Constants.DATE_TIME_PATTERN)
+    private LocalDateTime fechaCreacion;
 }

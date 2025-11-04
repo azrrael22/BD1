@@ -1,27 +1,20 @@
 package com.movesync.move_sync_api.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-
+import com.movesync.move_sync_api.infrastructurecross.Constants;
 import lombok.*;
-
 import java.time.LocalDate;
+import java.time.LocalDateTime; // NUEVO
 import java.util.List;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Usuario {
-
     private String idUsuario;
 
     @NotBlank
@@ -39,7 +32,6 @@ public class Usuario {
 
     private Double peso;
     private Integer estatura;
-
     private String genero;
 
     @NotBlank
@@ -52,6 +44,10 @@ public class Usuario {
     @Past
     @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate fechaNacimiento;
+
+    // NUEVO
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Constants.DATE_TIME_PATTERN)
+    private LocalDateTime fechaRegistro;
 
     @ToString.Exclude
     @EqualsAndHashCode.Exclude

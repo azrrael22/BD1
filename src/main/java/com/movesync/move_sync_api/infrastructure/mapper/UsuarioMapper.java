@@ -5,6 +5,7 @@ import com.movesync.move_sync_api.application.dto.out.usuario.UsuarioResponseDTO
 import com.movesync.move_sync_api.domain.entity.Usuario;
 
 public class UsuarioMapper {
+
     public static Usuario toEntity(UsuarioRequestDTO dto) {
         return Usuario.builder()
                 .primerNombre(dto.getPrimerNombre())
@@ -18,6 +19,7 @@ public class UsuarioMapper {
                 .contrasena(dto.getContrasena())
                 .correo(dto.getCorreo())
                 .fechaNacimiento(dto.getFechaNacimiento())
+                // fechaRegistro se establece automáticamente en el servicio
                 .build();
     }
 
@@ -29,6 +31,7 @@ public class UsuarioMapper {
                 .primerApellido(entity.getPrimerApellido())
                 .correo(entity.getCorreo())
                 .fechaNacimiento(entity.getFechaNacimiento())
+                .fechaRegistro(entity.getFechaRegistro()) // NUEVO
                 .build();
     }
 }

@@ -5,20 +5,29 @@ import com.movesync.move_sync_api.application.dto.out.evento.EventoResponseDTO;
 import com.movesync.move_sync_api.domain.entity.Evento;
 
 public class EventoMapper {
+
     public static Evento toEntity(EventoRequestDTO dto) {
         return Evento.builder()
-                .duracion(dto.getDuracion())
-                .fecha(dto.getFecha())
                 .nombre(dto.getNombre())
+                .descripcion(dto.getDescripcion()) // NUEVO
+                .fecha(dto.getFecha())
+                .duracion(dto.getDuracion())
+                .ubicacion(dto.getUbicacion()) // NUEVO
+                .capacidadMaxima(dto.getCapacidadMaxima()) // NUEVO
+                .estado(dto.getEstado()) // NUEVO - puede ser null, se establece en el servicio
                 .build();
     }
 
     public static EventoResponseDTO toResponse(Evento entity) {
         return EventoResponseDTO.builder()
                 .idEvento(entity.getIdEvento())
-                .duracion(entity.getDuracion())
-                .fecha(entity.getFecha())
                 .nombre(entity.getNombre())
+                .descripcion(entity.getDescripcion()) // NUEVO
+                .fecha(entity.getFecha())
+                .duracion(entity.getDuracion())
+                .ubicacion(entity.getUbicacion()) // NUEVO
+                .capacidadMaxima(entity.getCapacidadMaxima()) // NUEVO
+                .estado(entity.getEstado()) // NUEVO
                 .build();
     }
 }

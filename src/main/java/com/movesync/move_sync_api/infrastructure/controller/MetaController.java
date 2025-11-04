@@ -40,6 +40,16 @@ public class MetaController implements IMetaController {
         return ResponseEntity.ok(ApiResponse.success(Constants.META_OBTENIDA, response));
     }
 
+    // NUEVO - Obtener metas por usuario
+    @GetMapping("/usuario/{idUsuario}")
+    public ResponseEntity<ApiResponse<List<MetaResponseDTO>>> obtenerPorUsuario(@PathVariable String idUsuario) {
+        List<Meta> metas = metaService.obtenerPorUsuario(idUsuario);
+        List<MetaResponseDTO> response = metas.stream()
+                .map(MetaMapper::toResponse)
+                .toList();
+        return ResponseEntity.ok(ApiResponse.success(Constants.META_OBTENIDAS, response));
+    }
+
     @Override
     @PostMapping
     public ResponseEntity<ApiResponse<MetaResponseDTO>> registrarMeta(@Valid @RequestBody MetaRequestDTO request) {
@@ -52,7 +62,7 @@ public class MetaController implements IMetaController {
     @Override
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<MetaResponseDTO>> actualizarMeta(@PathVariable String id,
-                                                                        @Valid @RequestBody MetaRequestDTO request) {
+                                                                       @Valid @RequestBody MetaRequestDTO request) {
         Meta meta = MetaMapper.toEntity(request);
         meta.setIdMeta(id);
         metaService.actualizarMeta(meta);

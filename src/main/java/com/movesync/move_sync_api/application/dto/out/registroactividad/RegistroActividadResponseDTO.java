@@ -1,4 +1,4 @@
-package com.movesync.move_sync_api.application.dto.out.evento;
+package com.movesync.move_sync_api.application.dto.out.registroactividad;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.movesync.move_sync_api.infrastructurecross.Constants;
@@ -10,25 +10,19 @@ import java.time.LocalTime;
 
 @Data
 @Builder
-public class EventoResponseDTO {
+public class RegistroActividadResponseDTO {
+    private String idRegistro;
+    private String idUsuario;
+    private String idActividad;
     private String idEvento;
-
-    private String nombre;
-
-    // NUEVO
-    private String descripcion;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Constants.DATE_TIME_PATTERN)
     private LocalDateTime fecha;
 
     private LocalTime duracion;
-
-    // NUEVO
-    private String ubicacion;
-
-    // NUEVO
-    private Integer capacidadMaxima;
-
-    // NUEVO
-    private String estado;
+    private Double distancia;
+    private Integer caloriasEstimadas;
+    private Integer caloriasAlcanzadas;
+    private Integer frecuenciaCardiacaPromedio;
+    private String notas;
 }

@@ -13,6 +13,7 @@ import java.util.List;
 public interface IMetaController {
     ResponseEntity<ApiResponse<List<MetaResponseDTO>>> listarMetas();
     ResponseEntity<ApiResponse<MetaResponseDTO>> obtenerPorId(@PathVariable String idMeta);
+    ResponseEntity<ApiResponse<List<MetaResponseDTO>>> obtenerPorUsuario(@PathVariable String idUsuario); // NUEVO
     ResponseEntity<ApiResponse<MetaResponseDTO>> registrarMeta(@Valid @RequestBody MetaRequestDTO request);
     ResponseEntity<ApiResponse<MetaResponseDTO>> actualizarMeta(@PathVariable String id, @Valid @RequestBody MetaRequestDTO request);
     ResponseEntity<ApiResponse<Void>> eliminarMeta(@PathVariable String id);

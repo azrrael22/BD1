@@ -9,6 +9,8 @@ import org.springframework.stereotype.Repository;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp; // NUEVO
+import java.time.LocalDateTime; // NUEVO
 import java.util.List;
 import java.util.UUID;
 
@@ -23,8 +25,7 @@ public class UsuarioRepositoryImpl implements IUsuarioRepository {
 
     @Override
     public List<Usuario> findAll() {
-        String sql = "SELECT * FROM usuario ORDER BY id_usuario";
-
+        String sql = "SELECT * FROM usuario ORDER BY fecha_registro DESC"; // CAMBIADO
         try {
             return jdbcTemplate.query(sql, new UsuarioRowMapper());
         } catch (Exception e) {
@@ -36,7 +37,6 @@ public class UsuarioRepositoryImpl implements IUsuarioRepository {
     @Override
     public Usuario findById(String idUsuario) {
         String sql = "SELECT * FROM usuario WHERE id_usuario = ?";
-
         try {
             return jdbcTemplate.queryForObject(sql, new UsuarioRowMapper(), idUsuario);
         } catch (Exception e) {
@@ -58,16 +58,21 @@ public class UsuarioRepositoryImpl implements IUsuarioRepository {
 
     @Override
     public void save(Usuario usuario) {
-        //Genera el id si no existe
+        // Genera el id si no existe
         if (usuario.getIdUsuario() == null || usuario.getIdUsuario().isBlank()) {
             usuario.setIdUsuario(UUID.randomUUID().toString());
         }
 
+        // Establecer fecha de registro si no existe
+        if (usuario.getFechaRegistro() == null) {
+            usuario.setFechaRegistro(LocalDateTime.now());
+        }
+
         String sql = """
                 INSERT INTO usuario
-                (id_usuario,primer_nombre, segundo_nombre, primer_apellido, segundo_apellido,
-                 cedula, peso, estatura, genero, contrasena, correo, fecha_nacimiento)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                (id_usuario, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido,
+                 cedula, peso, estatura, genero, contrasena, correo, fecha_nacimiento, fecha_registro)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
         jdbcTemplate.update(sql,
                 usuario.getIdUsuario(),
@@ -81,7 +86,8 @@ public class UsuarioRepositoryImpl implements IUsuarioRepository {
                 usuario.getGenero(),
                 usuario.getContrasena(),
                 usuario.getCorreo(),
-                Date.valueOf(usuario.getFechaNacimiento())
+                Date.valueOf(usuario.getFechaNacimiento()),
+                Timestamp.valueOf(usuario.getFechaRegistro()) // NUEVO
         );
     }
 
@@ -108,18 +114,20 @@ public class UsuarioRepositoryImpl implements IUsuarioRepository {
                 Date.valueOf(usuario.getFechaNacimiento()),
                 usuario.getIdUsuario()
         );
+        // Nota: fecha_registro no se actualiza porque es cuando se registró originalmente
     }
 
     @Override
     public void deleteById(String idUsuario) {
-        // Borrar filas hijas que referencian al usuario antes de eliminar el usuario
+        // Borrar filas hijas que referencian al usuario antes de eliminarlo
         jdbcTemplate.update("DELETE FROM recomendacion WHERE id_usuario = ?", idUsuario);
         jdbcTemplate.update("DELETE FROM perfil_salud WHERE id_usuario = ?", idUsuario);
         jdbcTemplate.update("DELETE FROM historial_progreso WHERE id_usuario = ?", idUsuario);
         jdbcTemplate.update("DELETE FROM registro_participantes WHERE id_usuario = ?", idUsuario);
-        jdbcTemplate.update("DELETE FROM historial_progreso WHERE id_usuario = ?", idUsuario);
+        jdbcTemplate.update("DELETE FROM registro_actividad WHERE id_usuario = ?", idUsuario); // ACTUALIZADO
         jdbcTemplate.update("DELETE FROM logro WHERE id_usuario = ?", idUsuario);
         jdbcTemplate.update("DELETE FROM notificacion WHERE id_usuario = ?", idUsuario);
+        jdbcTemplate.update("DELETE FROM meta WHERE id_usuario = ?", idUsuario); // AGREGADO
 
         String sql = "DELETE FROM usuario WHERE id_usuario = ?";
         jdbcTemplate.update(sql, idUsuario);
@@ -141,6 +149,7 @@ public class UsuarioRepositoryImpl implements IUsuarioRepository {
                     .contrasena(rs.getString("contrasena"))
                     .correo(rs.getString("correo"))
                     .fechaNacimiento(rs.getDate("fecha_nacimiento").toLocalDate())
+                    .fechaRegistro(rs.getTimestamp("fecha_registro").toLocalDateTime()) // NUEVO
                     .build();
         }
     }

@@ -44,21 +44,31 @@ public class EventoRepositoryImpl implements IEventoRepository {
 
     @Override
     public void save(Evento evento) {
-        //Genera el id si no existe
+        // Genera el id si no existe
         if (evento.getIdEvento() == null || evento.getIdEvento().isBlank()) {
             evento.setIdEvento(UUID.randomUUID().toString());
         }
 
+        // Establecer estado por defecto si no existe
+        if (evento.getEstado() == null || evento.getEstado().isBlank()) {
+            evento.setEstado("PROGRAMADO");
+        }
+
         String sql = """
                 INSERT INTO evento
-                (id_evento , duracion, fecha, nombre)
-                VALUES (?, ?, ?, ?)
+                (id_evento, nombre, descripcion, fecha, duracion, 
+                 ubicacion, capacidad_maxima, estado)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """;
         jdbcTemplate.update(sql,
                 evento.getIdEvento(),
-                Time.valueOf(evento.getDuracion()),
+                evento.getNombre(),
+                evento.getDescripcion(), // NUEVO
                 Timestamp.valueOf(evento.getFecha()),
-                evento.getNombre()
+                Time.valueOf(evento.getDuracion()),
+                evento.getUbicacion(), // NUEVO
+                evento.getCapacidadMaxima(), // NUEVO
+                evento.getEstado() // NUEVO
         );
     }
 
@@ -66,21 +76,26 @@ public class EventoRepositoryImpl implements IEventoRepository {
     public void update(Evento evento) {
         String sql = """
                 UPDATE evento
-                SET duracion = ?, fecha = ?, nombre = ?
+                SET nombre = ?, descripcion = ?, fecha = ?, duracion = ?, 
+                    ubicacion = ?, capacidad_maxima = ?, estado = ?
                 WHERE id_evento = ?
                 """;
         jdbcTemplate.update(sql,
-                Time.valueOf(evento.getDuracion()),
-                Timestamp.valueOf(evento.getFecha()),
                 evento.getNombre(),
+                evento.getDescripcion(), // NUEVO
+                Timestamp.valueOf(evento.getFecha()),
+                Time.valueOf(evento.getDuracion()),
+                evento.getUbicacion(), // NUEVO
+                evento.getCapacidadMaxima(), // NUEVO
+                evento.getEstado(), // NUEVO
                 evento.getIdEvento()
         );
     }
 
     @Override
     public void deleteById(String idEvento) {
-        // Borrar filas hijas que referencian al usuario antes de eliminar el evento
-        jdbcTemplate.update("DELETE FROM calorias_estimadas WHERE id_evento = ?", idEvento);
+        // Borrar filas hijas que referencian al evento antes de eliminarlo
+        jdbcTemplate.update("DELETE FROM registro_actividad WHERE id_evento = ?", idEvento); // ACTUALIZADO
         jdbcTemplate.update("DELETE FROM registro_participantes WHERE id_evento = ?", idEvento);
 
         String sql = "DELETE FROM evento WHERE id_evento = ?";
@@ -92,9 +107,13 @@ public class EventoRepositoryImpl implements IEventoRepository {
         public Evento mapRow(ResultSet rs, int rowNum) throws SQLException {
             return Evento.builder()
                     .idEvento(rs.getString("id_evento"))
-                    .duracion(rs.getTime("duracion").toLocalTime())
-                    .fecha(rs.getTimestamp("fecha").toLocalDateTime())
                     .nombre(rs.getString("nombre"))
+                    .descripcion(rs.getString("descripcion")) // NUEVO
+                    .fecha(rs.getTimestamp("fecha").toLocalDateTime())
+                    .duracion(rs.getTime("duracion").toLocalTime())
+                    .ubicacion(rs.getString("ubicacion")) // NUEVO
+                    .capacidadMaxima(rs.getObject("capacidad_maxima", Integer.class)) // NUEVO
+                    .estado(rs.getString("estado")) // NUEVO
                     .build();
         }
     }

@@ -10,4 +10,6 @@ public interface IMetaRepository {
     void save(Meta meta);
     void update(Meta meta);
     void deleteById(String idMeta);
+
+    List<Meta> findByUsuario(String idUsuario);
 }
