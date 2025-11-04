@@ -6,11 +6,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp; // NUEVO
-import java.time.LocalDateTime; // NUEVO
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,7 +26,7 @@ public class UsuarioRepositoryImpl implements IUsuarioRepository {
 
     @Override
     public List<Usuario> findAll() {
-        String sql = "SELECT * FROM usuario ORDER BY fecha_registro DESC"; // CAMBIADO
+        String sql = "SELECT * FROM usuario ORDER BY fecha_registro DESC";
         try {
             return jdbcTemplate.query(sql, new UsuarioRowMapper());
         } catch (Exception e) {
@@ -58,12 +59,10 @@ public class UsuarioRepositoryImpl implements IUsuarioRepository {
 
     @Override
     public void save(Usuario usuario) {
-        // Genera el id si no existe
         if (usuario.getIdUsuario() == null || usuario.getIdUsuario().isBlank()) {
             usuario.setIdUsuario(UUID.randomUUID().toString());
         }
 
-        // Establecer fecha de registro si no existe
         if (usuario.getFechaRegistro() == null) {
             usuario.setFechaRegistro(LocalDateTime.now());
         }
@@ -87,7 +86,7 @@ public class UsuarioRepositoryImpl implements IUsuarioRepository {
                 usuario.getContrasena(),
                 usuario.getCorreo(),
                 Date.valueOf(usuario.getFechaNacimiento()),
-                Timestamp.valueOf(usuario.getFechaRegistro()) // NUEVO
+                Timestamp.valueOf(usuario.getFechaRegistro())
         );
     }
 
@@ -114,20 +113,18 @@ public class UsuarioRepositoryImpl implements IUsuarioRepository {
                 Date.valueOf(usuario.getFechaNacimiento()),
                 usuario.getIdUsuario()
         );
-        // Nota: fecha_registro no se actualiza porque es cuando se registró originalmente
     }
 
     @Override
     public void deleteById(String idUsuario) {
-        // Borrar filas hijas que referencian al usuario antes de eliminarlo
         jdbcTemplate.update("DELETE FROM recomendacion WHERE id_usuario = ?", idUsuario);
         jdbcTemplate.update("DELETE FROM perfil_salud WHERE id_usuario = ?", idUsuario);
         jdbcTemplate.update("DELETE FROM historial_progreso WHERE id_usuario = ?", idUsuario);
         jdbcTemplate.update("DELETE FROM registro_participantes WHERE id_usuario = ?", idUsuario);
-        jdbcTemplate.update("DELETE FROM registro_actividad WHERE id_usuario = ?", idUsuario); // ACTUALIZADO
+        jdbcTemplate.update("DELETE FROM registro_actividad WHERE id_usuario = ?", idUsuario);
         jdbcTemplate.update("DELETE FROM logro WHERE id_usuario = ?", idUsuario);
         jdbcTemplate.update("DELETE FROM notificacion WHERE id_usuario = ?", idUsuario);
-        jdbcTemplate.update("DELETE FROM meta WHERE id_usuario = ?", idUsuario); // AGREGADO
+        jdbcTemplate.update("DELETE FROM meta WHERE id_usuario = ?", idUsuario);
 
         String sql = "DELETE FROM usuario WHERE id_usuario = ?";
         jdbcTemplate.update(sql, idUsuario);
@@ -136,6 +133,10 @@ public class UsuarioRepositoryImpl implements IUsuarioRepository {
     private static class UsuarioRowMapper implements RowMapper<Usuario> {
         @Override
         public Usuario mapRow(ResultSet rs, int rowNum) throws SQLException {
+            // 🔧 CORRECCIÓN: Convertir BigDecimal a Double para el campo peso (NUMERIC)
+            BigDecimal pesoBD = rs.getBigDecimal("peso");
+            Double peso = (pesoBD != null) ? pesoBD.doubleValue() : null;
+
             return Usuario.builder()
                     .idUsuario(rs.getString("id_usuario"))
                     .primerNombre(rs.getString("primer_nombre"))
@@ -143,13 +144,13 @@ public class UsuarioRepositoryImpl implements IUsuarioRepository {
                     .primerApellido(rs.getString("primer_apellido"))
                     .segundoApellido(rs.getString("segundo_apellido"))
                     .cedula(rs.getString("cedula"))
-                    .peso(rs.getDouble("peso"))
+                    .peso(peso) // 🔧 CORREGIDO
                     .estatura(rs.getInt("estatura"))
                     .genero(rs.getString("genero"))
                     .contrasena(rs.getString("contrasena"))
                     .correo(rs.getString("correo"))
                     .fechaNacimiento(rs.getDate("fecha_nacimiento").toLocalDate())
-                    .fechaRegistro(rs.getTimestamp("fecha_registro").toLocalDateTime()) // NUEVO
+                    .fechaRegistro(rs.getTimestamp("fecha_registro").toLocalDateTime())
                     .build();
         }
     }
