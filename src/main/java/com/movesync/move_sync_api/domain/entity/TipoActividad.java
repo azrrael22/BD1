@@ -10,12 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class TipoActividad {
+
     private String idTipo;
+
     private String nombre;
-
-    // NUEVO
-    private String descripcion;
-
-    // NUEVO
-    private Integer caloriasPromedioPorHora;
 }

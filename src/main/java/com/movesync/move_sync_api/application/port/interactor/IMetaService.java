@@ -7,7 +7,6 @@ import java.util.List;
 public interface IMetaService {
     List<Meta> listarMetas();
     Meta obtenerPorId(String idMeta);
-    List<Meta> obtenerPorUsuario(String idUsuario); // NUEVO
     void registrarMeta(Meta meta);
     void actualizarMeta(Meta meta);
     void eliminarMeta(String idMeta);

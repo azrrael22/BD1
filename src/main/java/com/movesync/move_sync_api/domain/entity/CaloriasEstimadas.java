@@ -9,11 +9,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Actividad {
+public class CaloriasEstimadas {
+
+    private String idCaloriasEstimadas;
+
+    private String idEvento;
 
     private String idActividad;
-
-    private String idTipo;
-
-    private String descripcion;
 }

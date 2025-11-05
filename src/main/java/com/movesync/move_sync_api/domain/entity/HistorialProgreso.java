@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.time.LocalDate;
 
 @Data
@@ -13,18 +14,15 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Builder
 public class HistorialProgreso {
+
     private String idHistorial;
+
     private String idUsuario;
+
     private String idMeta;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Constants.DATA_PATTERN)
     private LocalDate fecha;
 
     private String avanceObjetivo;
-
-    // NUEVO
-    private Double pesoActual;
-
-    // NUEVO
-    private String notas;
 }

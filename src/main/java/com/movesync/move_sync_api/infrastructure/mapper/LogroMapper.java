@@ -5,7 +5,6 @@ import com.movesync.move_sync_api.application.dto.out.logro.LogroResponseDTO;
 import com.movesync.move_sync_api.domain.entity.Logro;
 
 public class LogroMapper {
-
     public static Logro toEntity(LogroRequestDTO dto) {
         return Logro.builder()
                 .nombre(dto.getNombre())
@@ -13,7 +12,6 @@ public class LogroMapper {
                 .descripcion(dto.getDescripcion())
                 .tipo(dto.getTipo())
                 .idUsuario(dto.getIdUsuario())
-                .puntos(dto.getPuntos()) // NUEVO - puede ser null, se establece en el servicio
                 .build();
     }
 
@@ -25,8 +23,6 @@ public class LogroMapper {
                 .descripcion(entity.getDescripcion())
                 .tipo(entity.getTipo())
                 .idUsuario(entity.getIdUsuario())
-                .fechaObtenido(entity.getFechaObtenido()) // NUEVO
-                .puntos(entity.getPuntos()) // NUEVO
                 .build();
     }
 }

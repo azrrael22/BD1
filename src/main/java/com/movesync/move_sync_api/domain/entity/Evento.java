@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
@@ -14,24 +15,13 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @Builder
 public class Evento {
+
     private String idEvento;
 
-    private String nombre;
-
-    // NUEVO
-    private String descripcion;
+    private LocalTime duracion;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Constants.DATE_TIME_PATTERN)
     private LocalDateTime fecha;
 
-    private LocalTime duracion;
-
-    // NUEVO
-    private String ubicacion;
-
-    // NUEVO
-    private Integer capacidadMaxima;
-
-    // NUEVO
-    private String estado; // PROGRAMADO, EN_CURSO, FINALIZADO, CANCELADO
+    private String nombre;
 }

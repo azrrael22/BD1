@@ -6,12 +6,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,7 +23,8 @@ public class UsuarioRepositoryImpl implements IUsuarioRepository {
 
     @Override
     public List<Usuario> findAll() {
-        String sql = "SELECT * FROM usuario ORDER BY fecha_registro DESC";
+        String sql = "SELECT * FROM usuario ORDER BY id_usuario";
+
         try {
             return jdbcTemplate.query(sql, new UsuarioRowMapper());
         } catch (Exception e) {
@@ -38,6 +36,7 @@ public class UsuarioRepositoryImpl implements IUsuarioRepository {
     @Override
     public Usuario findById(String idUsuario) {
         String sql = "SELECT * FROM usuario WHERE id_usuario = ?";
+
         try {
             return jdbcTemplate.queryForObject(sql, new UsuarioRowMapper(), idUsuario);
         } catch (Exception e) {
@@ -59,19 +58,16 @@ public class UsuarioRepositoryImpl implements IUsuarioRepository {
 
     @Override
     public void save(Usuario usuario) {
+        //Genera el id si no existe
         if (usuario.getIdUsuario() == null || usuario.getIdUsuario().isBlank()) {
             usuario.setIdUsuario(UUID.randomUUID().toString());
         }
 
-        if (usuario.getFechaRegistro() == null) {
-            usuario.setFechaRegistro(LocalDateTime.now());
-        }
-
         String sql = """
                 INSERT INTO usuario
-                (id_usuario, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido,
-                 cedula, peso, estatura, genero, contrasena, correo, fecha_nacimiento, fecha_registro)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                (id_usuario,primer_nombre, segundo_nombre, primer_apellido, segundo_apellido,
+                 cedula, peso, estatura, genero, contrasena, correo, fecha_nacimiento)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
         jdbcTemplate.update(sql,
                 usuario.getIdUsuario(),
@@ -85,8 +81,7 @@ public class UsuarioRepositoryImpl implements IUsuarioRepository {
                 usuario.getGenero(),
                 usuario.getContrasena(),
                 usuario.getCorreo(),
-                Date.valueOf(usuario.getFechaNacimiento()),
-                Timestamp.valueOf(usuario.getFechaRegistro())
+                Date.valueOf(usuario.getFechaNacimiento())
         );
     }
 
@@ -117,14 +112,14 @@ public class UsuarioRepositoryImpl implements IUsuarioRepository {
 
     @Override
     public void deleteById(String idUsuario) {
+        // Borrar filas hijas que referencian al usuario antes de eliminar el usuario
         jdbcTemplate.update("DELETE FROM recomendacion WHERE id_usuario = ?", idUsuario);
         jdbcTemplate.update("DELETE FROM perfil_salud WHERE id_usuario = ?", idUsuario);
         jdbcTemplate.update("DELETE FROM historial_progreso WHERE id_usuario = ?", idUsuario);
         jdbcTemplate.update("DELETE FROM registro_participantes WHERE id_usuario = ?", idUsuario);
-        jdbcTemplate.update("DELETE FROM registro_actividad WHERE id_usuario = ?", idUsuario);
+        jdbcTemplate.update("DELETE FROM historial_progreso WHERE id_usuario = ?", idUsuario);
         jdbcTemplate.update("DELETE FROM logro WHERE id_usuario = ?", idUsuario);
         jdbcTemplate.update("DELETE FROM notificacion WHERE id_usuario = ?", idUsuario);
-        jdbcTemplate.update("DELETE FROM meta WHERE id_usuario = ?", idUsuario);
 
         String sql = "DELETE FROM usuario WHERE id_usuario = ?";
         jdbcTemplate.update(sql, idUsuario);
@@ -133,10 +128,6 @@ public class UsuarioRepositoryImpl implements IUsuarioRepository {
     private static class UsuarioRowMapper implements RowMapper<Usuario> {
         @Override
         public Usuario mapRow(ResultSet rs, int rowNum) throws SQLException {
-            // 🔧 CORRECCIÓN: Convertir BigDecimal a Double para el campo peso (NUMERIC)
-            BigDecimal pesoBD = rs.getBigDecimal("peso");
-            Double peso = (pesoBD != null) ? pesoBD.doubleValue() : null;
-
             return Usuario.builder()
                     .idUsuario(rs.getString("id_usuario"))
                     .primerNombre(rs.getString("primer_nombre"))
@@ -144,13 +135,12 @@ public class UsuarioRepositoryImpl implements IUsuarioRepository {
                     .primerApellido(rs.getString("primer_apellido"))
                     .segundoApellido(rs.getString("segundo_apellido"))
                     .cedula(rs.getString("cedula"))
-                    .peso(peso) // 🔧 CORREGIDO
+                    .peso(rs.getDouble("peso"))
                     .estatura(rs.getInt("estatura"))
                     .genero(rs.getString("genero"))
                     .contrasena(rs.getString("contrasena"))
                     .correo(rs.getString("correo"))
                     .fechaNacimiento(rs.getDate("fecha_nacimiento").toLocalDate())
-                    .fechaRegistro(rs.getTimestamp("fecha_registro").toLocalDateTime())
                     .build();
         }
     }

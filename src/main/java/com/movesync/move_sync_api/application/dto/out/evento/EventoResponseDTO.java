@@ -1,7 +1,5 @@
 package com.movesync.move_sync_api.application.dto.out.evento;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.movesync.move_sync_api.infrastructurecross.Constants;
 import lombok.Builder;
 import lombok.Data;
 
@@ -12,23 +10,7 @@ import java.time.LocalTime;
 @Builder
 public class EventoResponseDTO {
     private String idEvento;
-
-    private String nombre;
-
-    // NUEVO
-    private String descripcion;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Constants.DATE_TIME_PATTERN)
-    private LocalDateTime fecha;
-
     private LocalTime duracion;
-
-    // NUEVO
-    private String ubicacion;
-
-    // NUEVO
-    private Integer capacidadMaxima;
-
-    // NUEVO
-    private String estado;
+    private LocalDateTime fecha;
+    private String nombre;
 }

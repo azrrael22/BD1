@@ -12,6 +12,7 @@ public class Constants {
     public static final String DATE_TIME_PATTERN = "dd-MM-yyyy HH:mm:ss";
     public static final TimeZone DEFAULT_TIMEZONE = TimeZone.getTimeZone("America/Bogota");
     public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(DATA_PATTERN);
+
     public static final DateTimeFormatter DATETIME_FORMATTER = DateTimeFormatter.ofPattern(DATE_TIME_PATTERN);
 
     // Mensajeria endpoints - Usuario
@@ -41,16 +42,8 @@ public class Constants {
     public static final String EVENTO_ACTUALIZADO = "Evento actualizado correctamente.";
     public static final String EVENTO_ELIMINADO = "Evento eliminado correctamente.";
 
-    // =============================================
-    // NUEVO - Mensajeria endpoints - Registro Actividad
-    // =============================================
-    public static final String REGISTRO_ACTIVIDAD_OBTENIDOS = "Registros de actividad obtenidos correctamente.";
-    public static final String REGISTRO_ACTIVIDAD_OBTENIDO = "Registro de actividad obtenido correctamente.";
-    public static final String REGISTRO_ACTIVIDAD_REGISTRADO = "Registro de actividad registrado correctamente.";
-    public static final String REGISTRO_ACTIVIDAD_ACTUALIZADO = "Registro de actividad actualizado correctamente.";
-    public static final String REGISTRO_ACTIVIDAD_ELIMINADO = "Registro de actividad eliminado correctamente.";
-
     // Errores
     public static final String ERROR_FORMATO_FECHA = "Formato de fecha inválido. Se espera dd/MM/yyyy";
     public static final String ERROR_FORMATO_FECHA_HORA = "Formato de fecha y hora inválido. Se espera dd/MM/yyyy HH:mm:ss";
+
 }

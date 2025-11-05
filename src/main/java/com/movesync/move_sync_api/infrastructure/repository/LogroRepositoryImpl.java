@@ -8,8 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp; // NUEVO
-import java.time.LocalDateTime; // NUEVO
 import java.util.List;
 import java.util.UUID;
 
@@ -24,7 +22,7 @@ public class LogroRepositoryImpl implements ILogroRepository {
 
     @Override
     public List<Logro> findAll() {
-        String sql = "SELECT * FROM logro ORDER BY fecha_obtenido DESC"; // CAMBIADO
+        String sql = "SELECT * FROM logro ORDER BY id_logro";
         try {
             return jdbcTemplate.query(sql, new LogroRowMapper());
         } catch (Exception e) {
@@ -44,7 +42,7 @@ public class LogroRepositoryImpl implements ILogroRepository {
 
     @Override
     public List<Logro> findByUsuario(String idUsuario) {
-        String sql = "SELECT * FROM logro WHERE id_usuario = ? ORDER BY fecha_obtenido DESC"; // CAMBIADO
+        String sql = "SELECT * FROM logro WHERE id_usuario = ? ORDER BY id_logro";
         try {
             return jdbcTemplate.query(sql, new LogroRowMapper(), idUsuario);
         } catch (Exception e) {
@@ -54,36 +52,23 @@ public class LogroRepositoryImpl implements ILogroRepository {
 
     @Override
     public void save(Logro logro) {
-        // Genera el id si no existe
+        //Genera el id si no existe
         if (logro.getIdLogro() == null || logro.getIdLogro().isBlank()) {
             logro.setIdLogro(UUID.randomUUID().toString());
         }
 
-        // Establecer fecha de obtención si no existe
-        if (logro.getFechaObtenido() == null) {
-            logro.setFechaObtenido(LocalDateTime.now());
-        }
-
-        // Establecer puntos por defecto si no existe
-        if (logro.getPuntos() == null) {
-            logro.setPuntos(0);
-        }
-
         String sql = """
                 INSERT INTO logro
-                (id_logro, id_usuario, nombre, recompensa, descripcion, 
-                 tipo, fecha_obtenido, puntos)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                (id_logro, nombre,recompensa, descripcion, tipo, id_usuario)
+                VALUES (?, ?, ?, ?, ?, ?)
                 """;
         jdbcTemplate.update(sql,
                 logro.getIdLogro(),
-                logro.getIdUsuario(),
                 logro.getNombre(),
                 logro.getRecompensa(),
                 logro.getDescripcion(),
                 logro.getTipo(),
-                Timestamp.valueOf(logro.getFechaObtenido()), // NUEVO
-                logro.getPuntos() // NUEVO
+                logro.getIdUsuario()
         );
     }
 
@@ -91,8 +76,7 @@ public class LogroRepositoryImpl implements ILogroRepository {
     public void update(Logro logro) {
         String sql = """
                 UPDATE logro
-                SET nombre = ?, recompensa = ?, descripcion = ?, tipo = ?, 
-                    id_usuario = ?, puntos = ?
+                SET nombre = ?, recompensa = ?, descripcion = ?, tipo = ?, id_usuario = ?
                 WHERE id_logro = ?
                 """;
         jdbcTemplate.update(sql,
@@ -101,10 +85,8 @@ public class LogroRepositoryImpl implements ILogroRepository {
                 logro.getDescripcion(),
                 logro.getTipo(),
                 logro.getIdUsuario(),
-                logro.getPuntos(), // NUEVO
                 logro.getIdLogro()
         );
-        // Nota: fecha_obtenido no se actualiza porque es cuando se obtuvo originalmente
     }
 
     @Override
@@ -118,13 +100,11 @@ public class LogroRepositoryImpl implements ILogroRepository {
         public Logro mapRow(ResultSet rs, int rowNum) throws SQLException {
             return Logro.builder()
                     .idLogro(rs.getString("id_logro"))
-                    .idUsuario(rs.getString("id_usuario"))
                     .nombre(rs.getString("nombre"))
                     .recompensa(rs.getString("recompensa"))
                     .descripcion(rs.getString("descripcion"))
                     .tipo(rs.getString("tipo"))
-                    .fechaObtenido(rs.getTimestamp("fecha_obtenido").toLocalDateTime()) // NUEVO
-                    .puntos(rs.getInt("puntos")) // NUEVO
+                    .idUsuario(rs.getString("id_usuario"))
                     .build();
         }
     }
